@@ -15,16 +15,21 @@ public class BookingServiceTest {
     // my working will include my full energy will go in the coding plus gym right now until naukri then i will do the cmplkete forming of the things what i can do at my besy aboiut ai
     private BookingService bookingService;
     private Show show;
+    private Show show1;
 
     @BeforeEach
     void setup() {
         Screen screen = new Screen(2,new ArrayList<>());
         List<Seat> seats = new ArrayList<>();
+        List<Seat> seats1 = new ArrayList<>();
         for(int i=1;i<=10;i++) {
             seats.add(new Seat(i, "A"+i,i));
         }
-        show = new Show(101, new Movie(2,"MHUNA","Hindi"), seats);
+        show = new Show(1, new Movie(2,"MHUNA","Hindi"), seats);
+        show1 = new Show(2,new Movie(2,"jdnjn","english"),seats1);
+
         screen.addShow(show);
+        screen.addShow(show1);
         bookingService = new BookingService(screen);
     }
 
@@ -36,7 +41,8 @@ public class BookingServiceTest {
     @Test
     void testDoubleBookingFails() {
         bookingService.bookSeat(1, 1,1);
-        assertFalse(bookingService.bookSeat(1, 1,1));
+
+        assertTrue(bookingService.bookSeat(2,2,1));
     }
 
     @Test

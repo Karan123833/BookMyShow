@@ -7,43 +7,43 @@ public class BookingService {
     private final Screen screen;
     private final Map<Integer, Show> shows = new HashMap<>();
     private final Map<Integer, Set<Integer>> bookedSeatsByShow = new ConcurrentHashMap<>();
-//    private final Map<Integer, Object> showLocks = new ConcurrentHashMap<>();
+    private final Map<Integer, Object> showLocks = new ConcurrentHashMap<>();
 
     public BookingService(Screen screen) {
         this.screen = screen;
         for(Show s : screen.getShows()) {
             shows.put(s.getShowId(), s);
             bookedSeatsByShow.put(s.getShowId(), ConcurrentHashMap.newKeySet());
-//            showLocks.put(s.getShowId(), new Object());
+            showLocks.put(s.getShowId(), new Object());
         }
     }
 
-    public synchronized boolean bookSeat(Integer userId, Integer showId, Integer seatId) {
+    public boolean bookSeat(Integer userId, Integer showId, Integer seatId) {
         Show show = shows.get(showId);
 
-//        Object lock = showLocks.computeIfAbsent(showId, k-> new Object());
+        Object lock = showLocks.computeIfAbsent(showId, k-> new Object());
 
-//        synchronized (lock) {
+        synchronized (lock) {
             Set<Integer> booked = bookedSeatsByShow.computeIfAbsent(showId, k->new HashSet<>());
             if(booked.contains(seatId)) {
                 return false;
             }
             booked.add(seatId);
             return true;
-//        }
+        }
     }
 
-    public synchronized boolean cancelSeat(Integer userId, Integer showId, Integer seatId) {
+    public boolean cancelSeat(Integer userId, Integer showId, Integer seatId) {
         Show show = shows.get(showId);
-//        Object lock = showLocks.computeIfAbsent(showId, k-> new Object());
-//        synchronized (lock) {
+        Object lock = showLocks.computeIfAbsent(showId, k-> new Object());
+        synchronized (lock) {
             Set<Integer> booked = bookedSeatsByShow.get(showId);
             if(booked == null || !booked.contains(seatId)) return false;
             if(booked.contains(seatId)) {
                 booked.remove(seatId);
             }
             return true;
-//        }
+        }
     }
 
     public List<Integer> getAvailableSeats(Integer showId) {
